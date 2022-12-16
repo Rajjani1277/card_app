@@ -10,15 +10,18 @@ import datetime
 
 class Show(Resource):
     def get(self):
-        cards = Card.objects().to_json()
+        cards = Card.objects().order_by('-id').to_json()
         return Response(cards, mimetype="application/json", status=200)
     
 class Show_by_id(Resource):
     def get(self,id):
+        try:
         # body = request.get_json()
-        cards = Card.objects.get(id=ObjectId(id))
-        print(cards.to_json())
-        return Response(cards.to_json(), mimetype="application/json", status=200)  
+            cards = Card.objects.get(id=ObjectId(id))
+            print(cards.to_json())
+            return Response(cards.to_json(), mimetype="application/json", status=200) 
+        except:
+            return 'Card is not exist.', 200
 
 class add_card(Resource):
     @jwt_required()
@@ -30,36 +33,45 @@ class add_card(Resource):
 
 class edit_card(Resource):
     @jwt_required()
-    def post(self):
+    def put(self):
         body = request.get_json()
         Card.objects.get(id=ObjectId(body["id"])).update(**body)
         return 'Successfully updated card', 200
 
 class delete_card(Resource):
     @jwt_required()
-    def post(self):
+    def delete(self):
         body = request.get_json()
         Card.objects.get(id=ObjectId(body["id"])).delete()
         return 'Successfully deleted card', 200
 
 class SignupApi(Resource):
     def post(self):
-        body = request.get_json()
-        user = User(**body).save()
-        id = user.id
-        return {'id': str(id)}, 200
+        try:
+            body = request.get_json()
+            user = User(**body).save()
+            id = user.id
+            return {'id': str(id)}, 200
+        except:
+            return {'error' :'Email is not in correct format.'}, 401
 
 class LoginApi(Resource):
     def post(self):
         body = request.get_json()
-        if User.objects.filter(email=body.get('email')) != []:
+        try:
             user = User.objects.get(email=body.get('email'))
             if user.password != body.get("password"):
                 return {'error': 'Email or password invalid'}, 401
             expires = datetime.timedelta(days=7)
             access_token = create_access_token(identity=str(user.id), expires_delta=expires)
             return {'access': access_token}, 200
-        else:
-            return {'error': 'Email is not available in our database'}, 401
+        except:
+            return {'error': 'Email or password is not correct.'}, 401
         
+class search(Resource):
+    def get(self,search):
+        # body = request.get_json()
+        search_result = Card.objects(Name__icontains=search).to_json()
+        
+        return Response(search_result, mimetype="application/json", status=200)
         

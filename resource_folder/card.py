@@ -69,9 +69,9 @@ class LoginApi(Resource):
             return {'error': 'Email or password is not correct.'}, 401
         
 class search(Resource):
-    def get(self,search):
-        # body = request.get_json()
-        search_result = Card.objects(Name__icontains=search).to_json()
+    def post(self):
+        body = request.get_json()
+        search_result = Card.objects(Name__icontains=body.get("search")).to_json()
         
         return Response(search_result, mimetype="application/json", status=200)
         

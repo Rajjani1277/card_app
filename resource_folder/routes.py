@@ -8,4 +8,4 @@ def initialize_routes(api):
     api.add_resource(SignupApi, '/register')
     api.add_resource(LoginApi, '/login')
     api.add_resource(Show_by_id, '/show_card/<id>')
-    api.add_resource(search, '/search/<search>')
+    api.add_resource(search, '/search')

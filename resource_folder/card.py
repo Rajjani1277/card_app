@@ -40,9 +40,9 @@ class edit_card(Resource):
 
 class delete_card(Resource):
     @jwt_required()
-    def delete(self):
-        body = request.get_json()
-        Card.objects.get(id=ObjectId(body["id"])).delete()
+    def delete(self,id):
+        # body = request.get_json()
+        Card.objects.get(id=ObjectId(id)).delete()
         return 'Successfully deleted card', 200
 
 class SignupApi(Resource):
